@@ -1,0 +1,1103 @@
+{
+  "datasets": [
+    {
+      "name": "32b77084",
+      "displayName": "dim_customer",
+      "config": {
+        "version": "1.1",
+        "source": "bakehouse_project.gld.dim_customer",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "f08d54bb",
+      "displayName": "dim_franchise",
+      "config": {
+        "version": "1.1",
+        "source": "bakehouse_project.gld.dim_franchise",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "81ed8b5e",
+      "displayName": "dim_supplier",
+      "config": {
+        "version": "1.1",
+        "source": "bakehouse_project.gld.dim_supplier",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "e7d0285e",
+      "displayName": "fact_reviews",
+      "config": {
+        "version": "1.1",
+        "source": "bakehouse_project.gld.fact_reviews",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "a2187fc5",
+      "displayName": "fact_sales",
+      "config": {
+        "version": "1.1",
+        "source": "bakehouse_project.gld.fact_sales",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          },
+          {
+            "name": "total_sales",
+            "expr": "SUM(total_price)",
+            "displayName": "Total Sales",
+            "format": {
+              "type": "number",
+              "abbreviation": "compact"
+            }
+          },
+          {
+            "name": "total_units",
+            "expr": "SUM(quantity)",
+            "displayName": "Total Units"
+          },
+          {
+            "name": "transaction_count",
+            "expr": "COUNT(DISTINCT transaction_id)",
+            "displayName": "Transactions"
+          },
+          {
+            "name": "avg_order_value",
+            "expr": "MEASURE(`total_sales`) / MEASURE(`transaction_count`)",
+            "displayName": "Average Order Value",
+            "format": {
+              "type": "number",
+              "decimalPlaces": {
+                "type": "exact",
+                "places": 2.0
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "relationshipGraphs": [
+    {
+      "sources": [
+        {
+          "name": "dim_customer",
+          "datasetName": "32b77084"
+        },
+        {
+          "name": "dim_franchise",
+          "datasetName": "f08d54bb"
+        },
+        {
+          "name": "dim_supplier",
+          "datasetName": "81ed8b5e"
+        },
+        {
+          "name": "fact_reviews",
+          "datasetName": "e7d0285e"
+        },
+        {
+          "name": "fact_sales",
+          "datasetName": "a2187fc5"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "relationship_0",
+          "from": "fact_sales",
+          "to": "dim_franchise",
+          "on": "`fact_sales`.`franchise_key` = `dim_franchise`.`franchise_key`",
+          "cardinality": "CARDINALITY_MANY_TO_ONE"
+        },
+        {
+          "name": "relationship_1",
+          "from": "fact_sales",
+          "to": "dim_customer",
+          "on": "`fact_sales`.`customer_key` = `dim_customer`.`customer_key`",
+          "cardinality": "CARDINALITY_MANY_TO_ONE"
+        },
+        {
+          "name": "relationship_2",
+          "from": "dim_franchise",
+          "to": "dim_supplier",
+          "on": "`dim_franchise`.`supplier_key` = `dim_supplier`.`supplier_key`",
+          "cardinality": "CARDINALITY_MANY_TO_ONE"
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "d4c34491",
+      "displayName": "Sales Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "counter_total_sales",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Sales"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "format": {
+                    "abbreviation": "compact",
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_transactions",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_sales__transaction_count)",
+                      "expression": "MEASURE(`fact_sales`.`transaction_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Transactions"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(fact_sales__transaction_count)",
+                  "format": {
+                    "abbreviation": "compact",
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_units",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_sales__total_units)",
+                      "expression": "MEASURE(`fact_sales`.`total_units`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Units Sold"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(fact_sales__total_units)",
+                  "format": {
+                    "abbreviation": "compact",
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_avg_order_value",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_sales__avg_order_value)",
+                      "expression": "MEASURE(`fact_sales`.`avg_order_value`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Order Value"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(fact_sales__avg_order_value)",
+                  "format": {
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "places": 2,
+                      "type": "exact"
+                    },
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "line_daily_sales",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "daily(fact_sales__paid_time)",
+                      "expression": "DATE_TRUNC(\"DAY\", `fact_sales`.`paid_time`)"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Daily Sales"
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(fact_sales__paid_time)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "franchise_performance",
+      "displayName": "Franchise Performance",
+      "layout": [
+        {
+          "widget": {
+            "name": "bar_top_franchises",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_franchise__name",
+                      "expression": "`dim_franchise`.`name`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top 10 Franchises by Sales"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_franchise__name",
+                  "scale": {
+                    "categorySize": {
+                      "number": 10,
+                      "type": "number-of-categories"
+                    },
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_sales_by_franchise_country",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_franchise__country",
+                      "expression": "`dim_franchise`.`country`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Franchise Country"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_franchise__country",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_sales_by_franchise_city",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_franchise__city",
+                      "expression": "`dim_franchise`.`city`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Franchise City"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_franchise__city",
+                  "scale": {
+                    "categorySize": {
+                      "number": 15,
+                      "type": "number-of-categories"
+                    },
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_sales_by_franchise_size",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_franchise__size",
+                      "expression": "`dim_franchise`.`size`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Franchise Size"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_franchise__size",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "products_payments",
+      "displayName": "Products & Payments",
+      "layout": [
+        {
+          "widget": {
+            "name": "bar_sales_by_product",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_sales__product",
+                      "expression": "`fact_sales`.`product`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Product"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_sales__product",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_units_by_product",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_sales__product",
+                      "expression": "`fact_sales`.`product`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_units)",
+                      "expression": "MEASURE(`fact_sales`.`total_units`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Units by Product"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_sales__product",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_units)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pie_sales_by_payment_method",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    },
+                    {
+                      "name": "fact_sales__payment_method",
+                      "expression": "`fact_sales`.`payment_method`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Payment Method"
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "fact_sales__payment_method",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_transactions_by_payment_method",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "fact_sales__payment_method",
+                      "expression": "`fact_sales`.`payment_method`"
+                    },
+                    {
+                      "name": "measure(fact_sales__transaction_count)",
+                      "expression": "MEASURE(`fact_sales`.`transaction_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Transactions by Payment Method"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "fact_sales__payment_method",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__transaction_count)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "customers_suppliers",
+      "displayName": "Customers & Suppliers",
+      "layout": [
+        {
+          "widget": {
+            "name": "bar_sales_by_customer_country",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_customer__country",
+                      "expression": "`dim_customer`.`country`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Customer Country"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_customer__country",
+                  "scale": {
+                    "categorySize": {
+                      "number": 15,
+                      "type": "number-of-categories"
+                    },
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_sales_by_customer_continent",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_customer__continent",
+                      "expression": "`dim_customer`.`continent`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Customer Continent"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_customer__continent",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "bar_sales_by_supplier_ingredient",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_supplier__ingredient",
+                      "expression": "`dim_supplier`.`ingredient`"
+                    },
+                    {
+                      "name": "measure(fact_sales__total_sales)",
+                      "expression": "MEASURE(`fact_sales`.`total_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Sales by Supplier Ingredient"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_supplier__ingredient",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(fact_sales__total_sales)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
